@@ -13,9 +13,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.rule.OutputCapture;
+import org.springframework.boot.test.system.OutputCaptureRule;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.socket.TextMessage;
 import org.springframework.web.socket.WebSocketSession;
@@ -24,8 +24,7 @@ import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.when;
 
 /**
@@ -47,7 +46,7 @@ public class SlackBotTest {
     private TestBot bot;
 
     @Rule
-    public OutputCapture capture = new OutputCapture();
+    public OutputCaptureRule capture = new OutputCaptureRule();
 
     @Before
     public void init() {
@@ -58,7 +57,6 @@ public class SlackBotTest {
         // set rtm
         when(slackService.getImChannelIds()).thenReturn(Arrays.asList("D1E79BACV", "C0NDSV5B8"));
         when(slackService.getCurrentUser()).thenReturn(user);
-        when(slackService.getWebSocketUrl()).thenReturn("");
     }
 
     @Test
@@ -68,7 +66,8 @@ public class SlackBotTest {
                 "\"user\": \"U023BECGF\"," +
                 "\"text\": \"<@UEADGH12S>: Hello\"}");
         bot.handleTextMessage(session, textMessage);
-        assertThat(capture.toString(), containsString("Hi, I am"));
+        assertTrue(capture.toString().contains("Hi, I am"));
+
     }
 
     @Test
@@ -79,7 +78,7 @@ public class SlackBotTest {
                 "\"user\": \"U023BECGF\"," +
                 "\"text\": \"Hello\"}");
         bot.handleTextMessage(session, textMessage);
-        assertThat(capture.toString(), containsString("this is a direct message"));
+        assertTrue(capture.toString().contains("this is a direct message"));
     }
 
     @Test
@@ -90,10 +89,10 @@ public class SlackBotTest {
                 "\"user\": \"U023BECGF\"," +
                 "\"text\": \"as12sd\"}");
         bot.handleTextMessage(session, textMessage);
-        assertThat(capture.toString(), containsString("First group: as12sd"));
-        assertThat(capture.toString(), containsString("Second group: as"));
-        assertThat(capture.toString(), containsString("Third group: 12"));
-        assertThat(capture.toString(), containsString("Fourth group: sd"));
+        assertTrue(capture.toString().contains("First group: as12sd"));
+        assertTrue(capture.toString().contains("Second group: as"));
+        assertTrue(capture.toString().contains("Third group: 12"));
+        assertTrue(capture.toString().contains("Fourth group: sd"));
     }
 
     @Test
@@ -104,7 +103,7 @@ public class SlackBotTest {
                 "\"user\": \"U023BECGF\"," +
                 "\"text\": \"as12sd\"}"); // this matches the pattern but it's a direct message instead of message
         bot.handleTextMessage(session, textMessage);
-        assertThat(capture.toString(), containsString("this is a direct message"));
+        assertTrue(capture.toString().contains("this is a direct message"));
     }
 
     @Test
@@ -115,7 +114,7 @@ public class SlackBotTest {
             "\"user\": \"U023BECGF\"," +
             "\"text\": \"HEY\"}"); // this matches the pattern with CASE_INSENSITIVE pattern flag on
         bot.handleTextMessage(session, textMessage);
-        assertThat(capture.toString(), containsString("hey case insensitive"));
+        assertTrue(capture.toString().contains("hey case insensitive"));
     }
 
     @Test
@@ -131,7 +130,7 @@ public class SlackBotTest {
                 "\"item_user\":\"U1G0EBU2G\"," +
                 "\"event_ts\":\"1471213126.954738\"}");
         bot.handleTextMessage(session, textMessage);
-        assertThat(capture.toString(), containsString("Thanks for the pin"));
+        assertTrue(capture.toString().contains("Thanks for the pin"));
     }
 
     @Test
@@ -142,7 +141,7 @@ public class SlackBotTest {
                 "\"file\":{\"id\":\"F219AF6VD\"}," +
                 "\"event_ts\":\"1471213812.962298\"}");
         bot.handleTextMessage(session, textMessage);
-        assertThat(capture.toString(), containsString("File shared"));
+        assertTrue(capture.toString().contains("File shared"));
     }
 
     @Test
@@ -152,7 +151,7 @@ public class SlackBotTest {
                 "\"channel\": \"A1E78BACV\"," +
                 "\"user\": \"U023BECGF\"}");
         bot.handleTextMessage(session, textMessage);
-        assertThat(capture.toString(), containsString("Welcome to the channel!"));
+        assertTrue(capture.toString().contains("Welcome to the channel!"));
     }
 
     @Test
@@ -162,7 +161,7 @@ public class SlackBotTest {
                 "\"channel\": \"A1E78BACV\"," +
                 "\"user\": \"U023BECGF\"}");
         bot.handleTextMessage(session, textMessage);
-        assertThat(capture.toString(), containsString("Someone just left."));
+        assertTrue(capture.toString().contains("Someone just left."));
     }
 
     /**
@@ -177,7 +176,7 @@ public class SlackBotTest {
                 "\"user\": \"U023BECGF\"," +
                 "\"text\": \"setup meeting\"}");
         bot.handleTextMessage(session, textMessage);
-        assertThat(capture.toString(), containsString("At what time (ex. 15:30) do you want me to set up the meeting?"));
+        assertTrue(capture.toString().contains("At what time (ex. 15:30) do you want me to set up the meeting?"));
 
         textMessage = new TextMessage("{\"type\": \"message\"," +
                 "\"ts\": \"1258878749.000002\"," +
@@ -185,7 +184,7 @@ public class SlackBotTest {
                 "\"user\": \"U023BECGF\"," +
                 "\"text\": \"12:50\"}");
         bot.handleTextMessage(session, textMessage);
-        assertThat(capture.toString(), containsString("Would you like to repeat it tomorrow?"));
+        assertTrue(capture.toString().contains("Would you like to repeat it tomorrow?"));
 
         textMessage = new TextMessage("{\"type\": \"message\"," +
                 "\"ts\": \"1358878749.000002\"," +
@@ -193,7 +192,7 @@ public class SlackBotTest {
                 "\"user\": \"U023BECGF\"," +
                 "\"text\": \"yes\"}");
         bot.handleTextMessage(session, textMessage);
-        assertThat(capture.toString(), containsString("Would you like me to set a reminder for you"));
+        assertTrue(capture.toString().contains("Would you like me to set a reminder for you"));
 
         textMessage = new TextMessage("{\"type\": \"message\"," +
                 "\"ts\": \"1458878749.000002\"," +
@@ -201,7 +200,7 @@ public class SlackBotTest {
                 "\"user\": \"U023BECGF\"," +
                 "\"text\": \"yes\"}");
         bot.handleTextMessage(session, textMessage);
-        assertThat(capture.toString(), containsString("I will remind you tomorrow before the meeting"));
+        assertTrue(capture.toString().contains("I will remind you tomorrow before the meeting"));
     }
 
     @Test
@@ -212,7 +211,7 @@ public class SlackBotTest {
                 "\"user\": \"U023BECGF\"," +
                 "\"text\": \"setup meeting\"}");
         bot.handleTextMessage(session, textMessage);
-        assertThat(capture.toString(), containsString("At what time (ex. 15:30) do you want me to set up the meeting?"));
+        assertTrue(capture.toString().contains("At what time (ex. 15:30) do you want me to set up the meeting?"));
 
         textMessage = new TextMessage("{\"type\": \"message\"," +
                 "\"ts\": \"1348878749.000302\"," +
@@ -220,7 +219,7 @@ public class SlackBotTest {
                 "\"user\": \"U023BECGF\"," +
                 "\"text\": \"12:40\"}");
         bot.handleTextMessage(session, textMessage);
-        assertThat(capture.toString(), containsString("Would you like to repeat it tomorrow?"));
+        assertTrue(capture.toString().contains("Would you like to repeat it tomorrow?"));
 
         textMessage = new TextMessage("{\"type\": \"message\"," +
                 "\"ts\": \"1358878749.000002\"," +
@@ -228,7 +227,7 @@ public class SlackBotTest {
                 "\"user\": \"U023BECGF\"," +
                 "\"text\": \"no\"}");
         bot.handleTextMessage(session, textMessage);
-        assertThat(capture.toString(), containsString("You can always schedule one with 'setup meeting' command"));
+        assertTrue(capture.toString().contains("You can always schedule one with 'setup meeting' command"));
     }
 
 

@@ -11,16 +11,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.runners.MockitoJUnitRunner;
+import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.rule.OutputCapture;
+import org.springframework.boot.test.system.OutputCaptureRule;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.web.client.RestTemplate;
 
 import java.io.IOException;
 
-import static org.hamcrest.Matchers.containsString;
-import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 /**
  * @author ramswaroop
@@ -38,7 +37,7 @@ public class FbBotTest {
     private TestBot bot;
 
     @Rule
-    public OutputCapture capture = new OutputCapture();
+    public OutputCaptureRule capture = new OutputCaptureRule();
     
     @Test
     public void When_PostbackInCallback_Then_InvokeOnReceivePostback() throws IOException {
@@ -47,7 +46,7 @@ public class FbBotTest {
                 "\"1373801119391393\"},\"recipient\":{\"id\":\"1854538851225832\"},\"timestamp\":1520772895257," +
                 "\"postback\":{\"payload\":\"hi\"}}]}]}", Callback.class);
         bot.setupWebhookEndpoint(callback);
-        assertThat(capture.toString(), containsString("Postback with payload `hi|hello|hey` received from facebook."));
+        assertTrue(capture.toString().contains("Postback with payload `hi|hello|hey` received from facebook."));
     }
 
     @Test
@@ -58,7 +57,7 @@ public class FbBotTest {
                 "\"message\":{\"mid\":\"mid.$cAAaWsSxbt_VoRmjuN1iFSOpOsmcC\",\"seq\":87625,\"text\":\"Sure\"," +
                 "\"quick_reply\":{\"payload\":\"yes\"}}}]}]}", Callback.class);
         bot.setupWebhookEndpoint(callback);
-        assertThat(capture.toString(), containsString("Quick reply button clicked with payload 'yes'"));
+        assertTrue(capture.toString().contains("Quick reply button clicked with payload 'yes'"));
     }
 
     @Test
@@ -69,7 +68,7 @@ public class FbBotTest {
                 "\"message\":{\"mid\":\"mid.$cAAaWsSxbt_VoRkDnt1iFPuiv7I5q\",\"seq\":87611,\"text\":" +
                 "\"setup meeting\"}}]}]}", Callback.class);
         bot.setupWebhookEndpoint(callback);
-        assertThat(capture.toString(), containsString("At what time (ex. 15:30) do you want me to set up the meeting?"));
+        assertTrue(capture.toString().contains("At what time (ex. 15:30) do you want me to set up the meeting?"));
 
         callback = new ObjectMapper().readValue("{\"object\":\"page\",\"entry\":[{\"id\":" +
                 "\"1854218851225832\",\"time\":1520770458290,\"messaging\":[{\"sender\":{\"id\":" +
@@ -77,7 +76,7 @@ public class FbBotTest {
                 "\"message\":{\"mid\":\"mid.$cAAaWsSxbt_VoRkDnt1iFPuiv7I5q\",\"seq\":87611,\"text\":" +
                 "\"11:45\"}}]}]}", Callback.class);
         bot.setupWebhookEndpoint(callback);
-        assertThat(capture.toString(), containsString("Would you like to repeat it tomorrow?"));
+        assertTrue(capture.toString().contains("Would you like to repeat it tomorrow?"));
 
         callback = new ObjectMapper().readValue("{\"object\":\"page\",\"entry\":[{\"id\":" +
                 "\"1854218851225832\",\"time\":1520770458290,\"messaging\":[{\"sender\":{\"id\":" +
@@ -85,7 +84,7 @@ public class FbBotTest {
                 "\"message\":{\"mid\":\"mid.$cAAaWsSxbt_VoRkDnt1iFPuiv7I5q\",\"seq\":87611,\"text\":" +
                 "\"yes\"}}]}]}", Callback.class);
         bot.setupWebhookEndpoint(callback);
-        assertThat(capture.toString(), containsString("Would you like me to set a reminder for you"));
+        assertTrue(capture.toString().contains("Would you like me to set a reminder for you"));
 
         callback = new ObjectMapper().readValue("{\"object\":\"page\",\"entry\":[{\"id\":" +
                 "\"1854218851225832\",\"time\":1520770458290,\"messaging\":[{\"sender\":{\"id\":" +
@@ -93,7 +92,7 @@ public class FbBotTest {
                 "\"message\":{\"mid\":\"mid.$cAAaWsSxbt_VoRkDnt1iFPuiv7I5q\",\"seq\":87611,\"text\":" +
                 "\"yes\"}}]}]}", Callback.class);
         bot.setupWebhookEndpoint(callback);
-        assertThat(capture.toString(), containsString("I will remind you tomorrow before the meeting"));
+        assertTrue(capture.toString().contains("I will remind you tomorrow before the meeting"));
     }
 
     @Test
@@ -104,7 +103,7 @@ public class FbBotTest {
                 "\"message\":{\"mid\":\"mid.$cAAaWsSxbt_VoRkDnt1iFPuiv7I5q\",\"seq\":87611,\"text\":" +
                 "\"setup meeting\"}}]}]}", Callback.class);
         bot.setupWebhookEndpoint(callback);
-        assertThat(capture.toString(), containsString("At what time (ex. 15:30) do you want me to set up the meeting?"));
+        assertTrue(capture.toString().contains("At what time (ex. 15:30) do you want me to set up the meeting?"));
 
         callback = new ObjectMapper().readValue("{\"object\":\"page\",\"entry\":[{\"id\":" +
                 "\"1854218851225832\",\"time\":1520770458290,\"messaging\":[{\"sender\":{\"id\":" +
@@ -112,7 +111,7 @@ public class FbBotTest {
                 "\"message\":{\"mid\":\"mid.$cAAaWsSxbt_VoRkDnt1iFPuiv7I5q\",\"seq\":87611,\"text\":" +
                 "\"11:45\"}}]}]}", Callback.class);
         bot.setupWebhookEndpoint(callback);
-        assertThat(capture.toString(), containsString("Would you like to repeat it tomorrow?"));
+        assertTrue(capture.toString().contains("Would you like to repeat it tomorrow?"));
 
         callback = new ObjectMapper().readValue("{\"object\":\"page\",\"entry\":[{\"id\":" +
                 "\"1854218851225832\",\"time\":1520770458290,\"messaging\":[{\"sender\":{\"id\":" +
@@ -120,7 +119,7 @@ public class FbBotTest {
                 "\"message\":{\"mid\":\"mid.$cAAaWsSxbt_VoRkDnt1iFPuiv7I5q\",\"seq\":87611,\"text\":" +
                 "\"no\"}}]}]}", Callback.class);
         bot.setupWebhookEndpoint(callback);
-        assertThat(capture.toString(), containsString("You can always schedule one with 'setup meeting' command"));
+        assertTrue(capture.toString().contains("You can always schedule one with 'setup meeting' command"));
     }
 
 
